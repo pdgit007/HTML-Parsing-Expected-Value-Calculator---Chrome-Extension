@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Parsing Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px 30px; /* Increased padding for width */
+            background-color: #f9f9f9;
+            min-width: 350px; /* Set a minimum width for the popup */
+        }
+        h1 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        #result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        hr {
+            border: 0;
+            height: 1px;
+            background: #ddd;
+            margin: 20px 0;
+        }
+        section {
+            margin-top: 20px;
+            padding: 10px;
+            background: #eef;
+            border-radius: 6px;
+        }
+        /* Make input wider for better appearance */
+        #sim-starting-balance {
+            width: 120px;
+        }
+        /* Autorun section specific styles */
+        #autorun-links {
+            width: 100%;
+            margin-top: 5px;
+        }
+        #autorun-btn {
+            margin-top: 10px;
+        }
+        #autorun-status {
+            margin-top: 10px;
+        }
+        /* Modal styles */
+        #selectorModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        #selectorModal > div {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 95vw;
+            box-shadow: 0 2px 12px #0003;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>HTML Parsing Calculator</h1>
+    <button id="parseButton">Parse Data</button>
+    <button id="manageSelectorsBtn" style="margin-left:10px;">Manage Selectors</button>
+    <button id="popout-btn" style="float:right;margin-top:0;margin-bottom:10px;background:#444;color:#fff;">Pop Out</button>
+    <label>
+        <input type="checkbox" id="autoClickOdds">
+        Auto-click odds buttons
+    </label>
+    <div id="result">Results will appear here.</div>
+    <!-- Selector Manager Modal -->
+    <div id="selectorModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;">
+      <div style="background:#fff;padding:20px;border-radius:8px;max-width:600px;width:95vw;box-shadow:0 2px 12px #0003;max-height:90vh;overflow-y:auto;">
+        <h2>Edit Selectors</h2>
+        <div style="display:flex;gap:10px;margin-bottom:12px;align-items:center;">
+          <button id="downloadSelectorsBtn">Download</button>
+          <input type="file" id="importSelectorsInput" accept="application/json" style="display:none;">
+          <button id="importSelectorsBtn">Import</button>
+          <button id="addSelectorBtn">Add Entry</button>
+        </div>
+        <div id="selectorsBySiteContainer">
+          <!-- Populated dynamically by popup.js -->
+        </div>
+        <div style="margin-top:18px;">
+          <button id="saveSelectorsBtn">Save</button>
+          <button id="cancelSelectorsBtn" style="margin-left:10px;">Cancel</button>
+        </div>
+        <!-- Add Selector Modal -->
+        <div id="addSelectorModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.25);z-index:1001;align-items:center;justify-content:center;">
+          <div style="background:#fff;padding:18px 24px;border-radius:8px;max-width:400px;width:90vw;box-shadow:0 2px 12px #0003;">
+            <h3>Add Selector Entry</h3>
+            <label>Site:<br><input id="addSiteInput" type="text" style="width:100%;margin-bottom:8px;"></label><br>
+            <label>Type:<br>
+              <select id="addTypeInput" style="width:100%;margin-bottom:8px;">
+                <option value="odds">odds</option>
+                <option value="value">value</option>
+                <option value="compared">compared</option>
+              </select>
+            </label><br>
+            <label>Selector:<br><input id="addSelectorInput" type="text" style="width:100%;margin-bottom:12px;"></label><br>
+            <div style="display:flex;gap:10px;justify-content:flex-end;">
+              <button id="addSelectorSaveBtn">Add</button>
+              <button id="addSelectorCancelBtn">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <section id="simulator-section">
+        <h2>Simulator</h2>
+        <label for="sim-starting-balance">Starting Balance:</label>
+        <input type="number" id="sim-starting-balance" value="20" min="0" step="0.01">
+        <button id="runSimulatorBtn">Run Simulator</button>
+        <div id="simulator-result" style="margin-top:10px;"></div>
+    </section>
+    <section id="autorun-section" style="margin-top:20px;padding:10px;background:#ffe;border-radius:6px;">
+        <h2>Autorun</h2>
+        <label for="autorun-links">Paste links (one per line):</label><br>
+        <textarea id="autorun-links" rows="5"></textarea><br>
+        <button id="autorun-btn">Start Autorun</button>
+        <button id="pause-btn" style="margin-left:10px;">Pause</button>
+        <button id="resume-btn" style="margin-left:5px;display:none;">Resume</button>
+        <div id="autorun-status"></div>
+        <div>
+          <label for="autorun-load-time" style="font-weight:bold;">Tab load time (ms):</label>
+          <input type="number" id="autorun-load-time" min="500" step="100" value="2000" style="width:80px;">
+        </div>
+        <div style="margin-top:10px;">
+          <label for="autorun-manual-delay" style="font-weight:bold;">Manual delay after load (ms):</label>
+          <input type="number" id="autorun-manual-delay" min="0" step="100" value="0" style="width:80px; margin-left:10px;">
+          <span style="margin-left:4px;">ms</span>
+        </div>
+        <div style="margin-top:10px;">
+          <label style="font-weight:bold;">
+            <input type="checkbox" id="autorun-new-window-toggle" style="margin-right:6px;">
+            Open each link in a new window
+          </label>
+        </div>
+    </section>
+    <script src="popup.js"></script>
+    <script src="autorun.js"></script>
+</body>
+</html>

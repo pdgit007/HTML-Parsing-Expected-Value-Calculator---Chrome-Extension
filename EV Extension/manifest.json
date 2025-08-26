@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "HTML Parsing Calculator",
+  "version": "1.0",
+  "description": "Parses raw HTML content from the active webpage, performs calculations, and displays results in a popup.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "downloads",
+    "storage",
+    "declarativeNetRequest"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "options_page": "options.html",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "run-extension": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y"
+      },
+      "description": "Run the HTML Parsing Calculator"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["selectorsearch.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
