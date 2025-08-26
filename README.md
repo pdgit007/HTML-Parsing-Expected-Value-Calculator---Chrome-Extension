@@ -6,4 +6,6 @@
 
 -Additionally, this extension does have button functionality, although it is currently hard coded and not flexible, as is the case with values/odds/cv arrays, and also, it does have an automation feature included with logs.
 
+-Also contains a simulation feature.
+
 -To install this extension, turn on developer tools in chrome and load an unpacked extension.
